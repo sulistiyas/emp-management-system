@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            // $table->foreignId('division_id')->nullable()->constrained('divisions', 'id_division')->onDelete('cascade');
+            $table->bigInteger('id_division')->unsigned();
+            $table->foreign('id_division')->references('id_division')->on('divisions')->onDelete('cascade')->onUpdate('cascade');
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
