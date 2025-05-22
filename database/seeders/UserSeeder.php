@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 class UserSeeder extends Seeder
 {
     /**
@@ -17,9 +18,38 @@ class UserSeeder extends Seeder
         $roles = ['super_admin', 'manager', 'director', 'hrd', 'staff'];
         $divisions = [1, 2, 3, 4, 5]; // Assuming these IDs exist
 
-        // Create roles
-        foreach ($roles as $role) {
-            Role::firstOrCreate(['name' => $role]);
+        // Define permissions
+        $permissions = [
+            'view role',
+            'view any role',
+            'view dashboard',
+            'view user',
+            'view any user',
+            'view division',
+            'view any division',
+            'view any permission',
+            'manage staff',
+            'manage users',
+            'manage system',
+        ];
+
+        // Create permissions
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // Create roles and assign permissions
+        foreach ($roles as $roleName) {
+            $role = Role::firstOrCreate(['name' => $roleName]);
+
+            // Assign permissions per role
+            match ($roleName) {
+                'super_admin' => $role->givePermissionTo($permissions),
+                'manager'     => $role->givePermissionTo(['view dashboard', 'manage staff', 'manage users']),
+                'director'    => $role->givePermissionTo(['view dashboard', 'manage staff', 'manage users']),
+                'hrd'         => $role->givePermissionTo(['view dashboard', 'manage staff']),
+                'staff'       => $role->givePermissionTo(['view dashboard']),
+            };
         }
 
         // Create users and assign roles and divisions
@@ -32,6 +62,8 @@ class UserSeeder extends Seeder
                 
             ])->assignRole($role);
         }
+
+        
         
         // User::create([
         //     'id_division' => 1,

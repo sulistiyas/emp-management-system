@@ -53,5 +53,19 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Division::class, 'id_division', 'id_division');
     }
+    
+    public function leaveMaster()
+    {
+        return $this->hasOne(LeaveMaster::class, 'id_users', 'id');
+    }
 
+    public function leaveList()
+    {
+        return $this->hasMany(LeaveList::class, 'id_users', 'id');
+    }
+
+    public function leaveApprovalBy()
+    {
+        return $this->hasMany(LeaveList::class, 'leave_approval_by', 'id');
+    }
 }
